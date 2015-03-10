@@ -1,0 +1,30 @@
+{
+  "name": "mongojs-paginate",
+  "version": "1.0.0",
+  "description": "Query pagination helper for mongojs",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -R spec test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saintedlama/mongojs-paginate.git"
+  },
+  "keywords": [
+    "mongojs",
+    "paginate",
+    "paging"
+  ],
+  "author": "Christoph Walcher <christoph.walcher@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saintedlama/mongojs-paginate/issues"
+  },
+  "homepage": "https://github.com/saintedlama/mongojs-paginate",
+  "devDependencies": {
+    "chai": "^2.1.1",
+    "mocha": "^2.2.1",
+    "mongojs": "^0.18.2",
+    "sinon": "^1.13.0"
+  }
+}
