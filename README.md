@@ -16,7 +16,7 @@ Query pagination helper for mongojs.
       .sort({ index : -1 });
 
     // Feed the query into paginate query function. Paging object with page and limit fields is required!
-    paginate.query(query, { limit : 3, page : 1 }, function(err, result) {
+    paginate(query, { limit : 3, page : 1 }, function(err, result) {
       // Result:
       // items: containing items of the desired page
       // itemCount: non paged count of items returned by query
