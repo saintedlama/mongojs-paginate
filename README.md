@@ -1,4 +1,6 @@
 # mongojs-paginate
+[![Build Status](https://travis-ci.org/saintedlama/mongojs-paginate.svg?branch=master)](https://travis-ci.org/saintedlama/mongojs-paginate)
+[![Coverage Status](https://coveralls.io/repos/github/saintedlama/mongojs-paginate/badge.svg?branch=master)](https://coveralls.io/github/saintedlama/mongojs-paginate?branch=master)
 
 Query pagination helper for mongojs.
 
