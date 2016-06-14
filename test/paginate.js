@@ -78,23 +78,29 @@ describe('paginate', function() {
   });
 
   describe('query', function() {
-    var db = mongojs('mongodb://somehost', ['pagination']); // Should not hit db - wrong connection string is used here to blow things up!
+    var db = mongojs('mongodb://localhost/mongojs-paginate-tests', ['pagination']);
 
-    var countStub;
-    var toArrayStub;
+    beforeEach(function(done) {
+      db.pagination.remove(function(err) {
+        if (err) { return done(err); }
 
-    afterEach(function() {
-      toArrayStub.restore();
-      countStub.restore();
+        db.pagination.insert([
+          { i: 1 },
+          { i: 2 },
+          { i: 3 },
+          { i: 4 },
+          { i: 5 },
+          { i: 6 },
+          { i: 7 },
+        ], done);
+      });
     });
 
     it('should execute a query and return one page', function(done) {
-      toArrayStub = sinon.stub(mongojs.Cursor.prototype, 'toArray', function(next) { next(null, [1,2,3])});
-      countStub = sinon.stub(mongojs.Cursor.prototype, 'count', function(next) { next(null, 8)});
-
       paginate(db.pagination.find(), { page : 1, limit : 3}, function(err, paginatedCollection) {
         expect(err).to.not.exist;
         expect(paginatedCollection).to.exist;
+        expect(paginatedCollection.items.length).to.equal(3);
 
         done();
       });
@@ -102,13 +108,14 @@ describe('paginate', function() {
 
 
     it('should pass items, item count, page and limit into paginatedCollection', function(done) {
-      toArrayStub = sinon.stub(mongojs.Cursor.prototype, 'toArray', function(next) { next(null, [1,2,3])});
-      countStub = sinon.stub(mongojs.Cursor.prototype, 'count', function(next) { next(null, 8)});
-
       paginate(db.pagination.find(), { page : 1, limit : 3}, function(err, paginatedCollection) {
         expect(err).to.not.exist;
-        expect(paginatedCollection.items).to.deep.equal([1,2,3]);
-        expect(paginatedCollection.itemCount).to.equal(8);
+
+        expect(paginatedCollection.items.map(function(item) {
+          return item.i
+        })).to.deep.equal([1,2,3]);
+
+        expect(paginatedCollection.itemCount).to.equal(7);
         expect(paginatedCollection.page).to.equal(1);
         expect(paginatedCollection.limit).to.equal(3);
 
@@ -117,9 +124,6 @@ describe('paginate', function() {
     });
 
     it('should calculate pageCount, next, hasNext, previous and hasPrevious', function(done) {
-      toArrayStub = sinon.stub(mongojs.Cursor.prototype, 'toArray', function(next) { next(null, [1,2,3])});
-      countStub = sinon.stub(mongojs.Cursor.prototype, 'count', function(next) { next(null, 8)});
-
       paginate(db.pagination.find(), { page : 1, limit : 3}, function(err, paginatedCollection) {
         expect(err).to.not.exist;
         expect(paginatedCollection.pageCount).to.equal(3);
@@ -128,6 +132,24 @@ describe('paginate', function() {
         expect(paginatedCollection.hasNext).to.equal(true);
         expect(paginatedCollection.previous).to.not.exist;
         expect(paginatedCollection.hasPrevious).to.equal(false);
+
+        done();
+      });
+    });
+
+    it('should get last page with hasNext set to false', function(done) {
+      paginate(db.pagination.find(), { page : 3, limit : 3}, function(err, paginatedCollection) {
+        expect(err).to.not.exist;
+        expect(paginatedCollection.pageCount).to.equal(3);
+
+        expect(paginatedCollection.items.map(function(item) {
+          return item.i
+        })).to.deep.equal([7]);
+
+        expect(paginatedCollection.next).to.not.exist;
+        expect(paginatedCollection.hasNext).to.equal(false);
+        expect(paginatedCollection.previous).to.equal(2);
+        expect(paginatedCollection.hasPrevious).to.equal(true);
 
         done();
       });
